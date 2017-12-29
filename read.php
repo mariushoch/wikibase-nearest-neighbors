@@ -22,4 +22,5 @@ while ( ( $line = fgets( $f ) ) !== false ) {
 	}
 
 	$numericPropertyIds = $entityReader->readLineString( $line );
+	
 }

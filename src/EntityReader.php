@@ -15,7 +15,13 @@ class EntityReader {
 	 * @return int[] Array of the (numerical) property ids of the statements
 	 */
 	public function readLineString( $str ) {
-		$entity = json_decode( substr( $str, 0, -2 ), true );
+		if ( substr( $str, -2, 1 ) === ',' ) {
+			$str = substr( $str, 0, -2 );
+		} else {
+			$str = substr( $str, 0, -1 );
+		}
+
+		$entity = json_decode( $str, true );
 		if ( !is_array( $entity ) ) {
 			throw new RuntimeException( "Couldn't decode entity: " . json_last_error_msg() );
 		}

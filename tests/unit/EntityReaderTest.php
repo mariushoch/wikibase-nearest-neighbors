@@ -11,20 +11,36 @@ use Wikibase\NearestNeighbors\EntityReader;
  */
 class EntityReaderTest extends PHPUnit_Framework_TestCase {
 
-	public function testReadLineString() {
-		$entityReader = new EntityReader();
-
+	public function provideReadLineString() {
 		$str = '{' .
 			'"ignore": "stuff",' .
 			'"labels":{"en":{"language":"en","value":"wobba"}},' .
 			'"descriptions":{"en":{"language":"en","value":"something something"}},' .
 			'"aliases":{"ru":[{"language":"ru","value":"blah"}]},' .
 			'"claims":{"P31":"aha", "P42":{"Ignore":{"this": ["please"]}}}' .
-			"},\n";
+			'}';
+
+		return [
+			'Line with trailing comma' => [
+				[ 31, 42 ],
+				$str . ",\n"
+			],
+			'Line without trailing comma' => [
+				[ 31, 42 ],
+				$str . "\n"
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider provideReadLineString
+	 */
+	public function testReadLineString( $expected, $line ) {
+		$entityReader = new EntityReader();
 
 		$this->assertSame(
 			[ 31, 42 ],
-			$entityReader->readLineString( $str )
+			$entityReader->readLineString( $line )
 		);
 	}
 

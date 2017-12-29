@@ -7,7 +7,7 @@ use PHPUnit_Framework_TestCase;
 use Wikibase\NearestNeighbors\EntityReader;
 
 /**
- * Reads entities (as found in JSON dumps) and yields the ids of the statements on them.
+ * @covers Wikibase\NearestNeighbors\EntityReader
  */
 class EntityReaderTest extends PHPUnit_Framework_TestCase {
 

@@ -2,7 +2,6 @@
 
 namespace Wikibase\NearestNeighbors;
 
-use Wikibase\NearestNeighbors\PropertyIdEncoder;
 use Wikibase\NearestNeighbors\FieldProviders\PropLinksFieldProvider;
 use Wikibase\NearestNeighbors\FieldProviders\WikibaseAllPropertiesFieldProvider;
 

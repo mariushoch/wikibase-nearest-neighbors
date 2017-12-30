@@ -4,7 +4,7 @@ namespace Wikibase\NearestNeighbors;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-function getResFromFile( $fileName, $needleEntityData ) {
+function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 	$f = fopen( $fileName, 'r' );
 	$header = fgets( $f );
 
@@ -52,7 +52,7 @@ function getResFromFile( $fileName, $needleEntityData ) {
 		}
 
 		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts ) + $missingFromList;
-		if ( $dist <= $cutOff ) {
+		if ( $dist <= $cutOff && $dist > $minDistance ) {
 			$results[$entityId] = $dist;
 		}
 
@@ -82,7 +82,7 @@ function cutOffResults( &$results ) {
 
 // FIXME: Use getopt or something similar…
 // TODO: Make sure this is not Wikidata specific
-if ( $argc < 4 || $argc[1] === '--help' || $argc[1] === '-h' ) {
+if ( $argc < 4 || $argv[1] === '--help' || $argv[1] === '-h' ) {
 	echo "generateEncodingFromDump.php: Read a Wikidata JSON dump and output minimal encoding of the statements present.\n\n";
 	echo "Usage: EntityId InputFileFullEncoding InputFileTop100Encoding [minDistance]\n";
 
@@ -93,8 +93,9 @@ $entityReader = new EntityReader();
 $needleEntity = file_get_contents( 'https://www.wikidata.org/wiki/Special:EntityData/' . $argv[1] . '.json' );
 $needleEntityData = $entityReader->readEntityDataString( $needleEntity );
 
-$results = getResFromFile( $argv[2], $needleEntityData );
-$results = array_merge( $results, getResFromFile( $argv[3], $needleEntityData ) );
+$minDistance = isset( $argv[4] ) ? $argv[4] : -1;
+$results = getResFromFile( $argv[2], $needleEntityData, $minDistance );
+$results = array_merge( $results, getResFromFile( $argv[3], $needleEntityData, $minDistance ) );
 
 $displayResults = [];
 $i = 0;

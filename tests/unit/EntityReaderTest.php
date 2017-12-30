@@ -67,4 +67,17 @@ class EntityReaderTest extends PHPUnit_Framework_TestCase {
 		$entityReader->readLineString( "crap" );
 	}
 
+	public function testReadEntityDataString() {
+		$entityReader = new EntityReader();
+
+		$q42JSON = file_get_contents( 'https://www.wikidata.org/wiki/Special:EntityData/Q42.json' );
+		$result = $entityReader->readEntityDataString( $q42JSON );
+
+		$this->assertSame( 'Q42', $result[0] );
+		$this->assertContains( 31, $result[1] );
+
+		foreach ( $result[1] as $numericalPropertyId ) {
+			$this->assertInternalType( 'integer', $numericalPropertyId );
+		}
+	}
 }

@@ -1,1 +1,2 @@
-* Make the CLI entry point (`read.php`) not Wikidata specific
+* Make `generateEncodingFromDump.php` not Wikidata specific
+* (Maybe) Mock production `file_get_contents` calls

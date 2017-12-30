@@ -18,22 +18,23 @@ if ( $argc !== 4 || $argc[1] === '--help' || $argc[1] === '-h' ) {
 }
 
 $entityReader = new EntityReader();
+
+$fullFields = ( new WikibaseAllPropertiesFieldProvider(
+		'https://www.wikidata.org/w/api.php',
+		120
+	) )->getFields();
+$top100Fields = ( new PropLinksFieldProvider(
+		'https://www.wikidata.org/w/api.php',
+		'Wikidata:Database reports/List of properties/Top100',
+		120
+	) )->getFields();
+
+file_put_contents( $argv[2], implode( ',', $fullFields ) . "\n" );
+file_put_contents( $argv[3], implode( ',', $top100Fields ). "\n" );
+
 $encoders = [
-	new PropertyIdEncoder(
-		( new WikibaseAllPropertiesFieldProvider(
-			'https://www.wikidata.org/w/api.php',
-			120
-		) )->getFields(),
-		'full'
-	),
-	new PropertyIdEncoder(
-		( new PropLinksFieldProvider(
-			'https://www.wikidata.org/w/api.php',
-			'Wikidata:Database reports/List of properties/Top100',
-			120
-		) )->getFields(),
-		'top100'
-	)
+	new PropertyIdEncoder( $fullFields, 'full' ),
+	new PropertyIdEncoder( $top100Fields, 'top100' )
 ];
 
 $partitioningPropertyIdEncoder = new PartitioningPropertyIdEncoder( $encoders );

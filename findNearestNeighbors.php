@@ -14,7 +14,7 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 	}
 
 	$hammingDistanceCalculator = new IntArrayHammingDistanceCalculator();
-	
+
 	$entityOrder = array_map( 'intval', explode( ',', $header ) );
 	// Some property ids might not be present in the current encoding file at all,
 	// thus we always have at least this distance.
@@ -82,9 +82,9 @@ function cutOffResults( &$results ) {
 
 // FIXME: Use getopt or something similar…
 // TODO: Make sure this is not Wikidata specific
-if ( $argc < 4 || $argv[1] === '--help' || $argv[1] === '-h' ) {
+if ( $argc < 3 || $argv[1] === '--help' || $argv[1] === '-h' ) {
 	echo "generateEncodingFromDump.php: Read a Wikidata JSON dump and output minimal encoding of the statements present.\n\n";
-	echo "Usage: EntityId InputFileFullEncoding InputFileTop100Encoding [minDistance]\n";
+	echo "Usage: EntityId EncodingInputFile [EncodingInputFile]* [--min-distance minDistance]\n";
 
 	exit( 1 );
 }
@@ -93,14 +93,31 @@ $entityReader = new EntityReader();
 $needleEntity = file_get_contents( 'https://www.wikidata.org/wiki/Special:EntityData/' . $argv[1] . '.json' );
 $needleEntityData = $entityReader->readEntityDataString( $needleEntity );
 
-$minDistance = isset( $argv[4] ) ? $argv[4] : -1;
-$results = getResFromFile( $argv[2], $needleEntityData, $minDistance );
-$results = array_merge( $results, getResFromFile( $argv[3], $needleEntityData, $minDistance ) );
+$encodedFiles = [];
+$remainingArgs = array_slice( $argv, 2 );
+while ( $remainingArgs && $remainingArgs[0] !== '--min-distance' ) {
+	$encodedFiles[] = array_shift( $remainingArgs );
+}
+
+if ( isset( $remainingArgs[1] ) ) {
+	$minDistance = intval( $remainingArgs[1] );
+} else {
+	$minDistance = -1;
+}
+
+$results = [];
+
+foreach ( $encodedFiles as $encodedFile ) {
+	$results = array_merge(
+		$results,
+		getResFromFile( $encodedFile, $needleEntityData, $minDistance )
+	);
+}
 
 $displayResults = [];
 $i = 0;
 foreach ( $results as $id => $row ) {
-	$displayResults[$row * 10000 + ++$i] = [ $id, $row ];
+	$displayResults[$row * 100000 + ++$i] = [ $id, $row ];
 }
 
 ksort( $displayResults );

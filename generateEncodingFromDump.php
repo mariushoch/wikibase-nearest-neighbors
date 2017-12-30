@@ -7,6 +7,19 @@ use Wikibase\NearestNeighbors\FieldProviders\WikibaseAllPropertiesFieldProvider;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+function flushBuffers( array &$buffer ) {
+	global $argv;
+
+	if ( isset( $buffer['full'] ) ) {
+		file_put_contents( $argv[2], $buffer['full'], FILE_APPEND );
+	}
+	if ( isset( $buffer['top100'] ) ) {
+		file_put_contents( $argv[3], $buffer['top100'], FILE_APPEND );
+	}
+
+	$buffer = [];
+}
+
 // FIXME: Use getopt or something similar…
 // TODO: Make sure this is not Wikidata specific
 if ( $argc !== 4 || $argv[1] === '--help' || $argv[1] === '-h' ) {
@@ -60,13 +73,10 @@ while ( ( $line = fgets( $f ) ) !== false ) {
 
 	// Only write to target file for every 10000 rows
 	if ( $i % 10000 === 0 ) {
-		file_put_contents( $argv[2], $buffer['full'], FILE_APPEND );
-		file_put_contents( $argv[3], $buffer['top100'], FILE_APPEND );
-		$buffer = [];
+		flushBuffers( $buffer );
 
 		echo $i . " done\n";
 	}
 }
 
-file_put_contents( $argv[2], $buffer['full'], FILE_APPEND );
-file_put_contents( $argv[3], $buffer['top100'], FILE_APPEND );
+flushBuffers( $buffer );

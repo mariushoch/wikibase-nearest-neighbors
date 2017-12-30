@@ -1,0 +1,1 @@
+* Make the CLI entry point (`read.php`) not Wikidata specific

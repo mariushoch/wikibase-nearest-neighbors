@@ -11,7 +11,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 // FIXME: Use getopt or something similar…
 // TODO: Make sure this is not Wikidata specific
 if ( $argc !== 4 || $argc[1] === '--help' || $argc[1] === '-h' ) {
-	echo "read.php: Read a Wikidata JSON dump and output minimal encoding of the statements present.\n\n";
+	echo "generateEncodingFromDump.php: Read a Wikidata JSON dump and output minimal encoding of the statements present.\n\n";
 	echo "Usage: InputFile OutputFileFullEncoding OutputFileTop100Encoding\n";
 
 	exit( 1 );

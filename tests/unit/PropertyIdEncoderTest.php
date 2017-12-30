@@ -29,26 +29,33 @@ class PropertyIdEncoderTest extends PHPUnit_Framework_TestCase {
 
 		return [
 			'trivial test case' => [
-				'',
+				[ true, '' ],
 				[],
 				[]
 			],
 			'One byte only #0' => [
-				chr( 1 << 5 ),
+				[ true, chr( 1 << 5 ) ],
 				[ 1, 2, 3, 4 ],
 				[ 3 ]
 			],
 			'One byte only #1' => [
-				chr( 1 << 3 ),
+				[ true, chr( 1 << 3 ) ],
 				[ 1, 2, 2, 2, 3, 2, 2, 2 ],
 				[ 3 ]
 			],
+			'Not everything encoded' => [
+				[ false, chr( 1 << 3 ) ],
+				[ 1, 2, 2, 2, 3, 2, 2, 2 ],
+				[ 3, 92 ]
+			],
 			'Long field list, nothing set' => [
-				"\0\0\0\0\0\0\0\0\0\0\0\0\0",
+				[ true, "\0\0\0\0\0\0\0\0\0\0\0\0\0" ],
 				$fields,
 				[]
 			],
 			'Long field list, a few set' => [
+				[
+					true,
 					chr( 1 << 3 ) .
 					"\0" .
 					chr( 1 << 0 ) .
@@ -58,7 +65,8 @@ class PropertyIdEncoderTest extends PHPUnit_Framework_TestCase {
 					chr( 3 << 4 ) .
 					"\0" .
 					chr( 1 << 7 ) .
-					"\0\0",
+					"\0\0"
+				],
 				$fields,
 				[ 1, 2, 3, 4, 5, 6 ]
 			],
@@ -69,9 +77,21 @@ class PropertyIdEncoderTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider provideGetEncoded
 	 */
 	public function testGetEncoded( $expected, array $fields, array $numericPropertyIds ) {
-		$encoder = new PropertyIdEncoder( $fields );
+		$encoder = new PropertyIdEncoder( $fields, '34c3' );
 
 		$this->assertSame( $expected, $encoder->getEncoded( $numericPropertyIds ) );
 	}
 
+	public function testGetFieldCount() {
+		$encoder = new PropertyIdEncoder( [1, 1, 1, 1], '34c3' );
+
+		$this->assertSame( 4, $encoder->getFieldCount() );
+	}
+
+	public function testGetName() {
+		$encoder = new PropertyIdEncoder( [], '34c3' );
+
+		$this->assertSame( '34c3', $encoder->getName() );
+	}
+	
 }

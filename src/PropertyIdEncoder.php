@@ -25,12 +25,19 @@ class PropertyIdEncoder {
 	private $fieldChunks;
 
 	/**
-	 * @param int $fields
+	 * @var string
 	 */
-	public function __construct( array $fields ) {
+	private $name;
+
+	/**
+	 * @param int $fields
+	 * @param string $name
+	 */
+	public function __construct( array $fields, $name ) {
 		$this->fields = $fields;
 		$this->fieldCount = count( $fields );
 		$this->fieldChunks = array_chunk( $fields, PHP_INT_SIZE * 8 );
+		$this->name = $name;
 	}
 
 	/**
@@ -39,12 +46,13 @@ class PropertyIdEncoder {
 	 *
 	 * @param int[] $numericPropertyIds
 	 *
-	 * @return string
+	 * @return array First value denotes whether all properties could be encoded, second value is the byte string
 	 */
 	public function getEncoded( array $numericPropertyIds ) {
 		$numericPropertyIds = array_combine( $numericPropertyIds, $numericPropertyIds );
 
 		$encoded = [];
+		$covered = 0;
 		// TODO: This could probably be done way smarter…
 		foreach ( $this->fieldChunks as $fieldChunk ) {
 			$int = 0;
@@ -53,6 +61,7 @@ class PropertyIdEncoder {
 			foreach ( $fieldChunk as $field ) {
 				$i--;
 				if ( isset( $numericPropertyIds[$field] ) ) {
+					$covered++;
 					$int = $int | 1 << $i;
 				}
 			}
@@ -66,7 +75,24 @@ class PropertyIdEncoder {
 		);
 
 		// Shorten encoded string as much as possible
-		return substr( $byteString, 0, ceil( $this->fieldCount / 8 ) );
+		return [
+			$covered === count( $numericPropertyIds ),
+			substr( $byteString, 0, ceil( $this->fieldCount / 8 ) )
+		];
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFieldCount() {
+		return $this->fieldCount;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return $this->name;
 	}
 
 }

@@ -82,8 +82,19 @@ class PropertyIdEncoderTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame( $expected, $encoder->getEncoded( $numericPropertyIds ) );
 	}
 
+	public function testEncodingToIntArray() {
+		$encoder = new PropertyIdEncoder( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ], '34c3' );
+
+		$encoded = $encoder->getEncoded( [ 4 ] )[1];
+
+		$this->assertSame(
+			[ 0 | 1 << ( PHP_INT_SIZE * 8 - 4 ) ],
+			$encoder->encodingToIntArray( $encoded )
+		);
+	}
+
 	public function testGetFieldCount() {
-		$encoder = new PropertyIdEncoder( [1, 1, 1, 1], '34c3' );
+		$encoder = new PropertyIdEncoder( [ 1, 1, 1, 1 ], '34c3' );
 
 		$this->assertSame( 4, $encoder->getFieldCount() );
 	}

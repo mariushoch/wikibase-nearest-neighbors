@@ -74,11 +74,25 @@ class PropertyIdEncoder {
 			array_merge( [ 'J*' ], $encoded )
 		);
 
-		// Shorten encoded string as much as possible
+		// Trim encoded string as much as possible
 		return [
 			$covered === count( $numericPropertyIds ),
 			substr( $byteString, 0, ceil( $this->fieldCount / 8 ) )
 		];
+	}
+
+	/**
+	 * Reads encoded bytes (as obtained via "getEncoded") and converts them to
+	 * an integer array (that can be used for hamming distance computation).
+	 *
+	 * @param str $encodedBytes
+	 * @return int[]
+	 */
+	public function encodingToIntArray( $encodedBytes ) {
+		$missingBytes = ( PHP_INT_SIZE * 8 - ( $this->fieldCount % ( PHP_INT_SIZE * 8 ) ) ) % ( PHP_INT_SIZE * 8 );
+		$appendBytes = str_repeat( "\0", floor( $missingBytes / 8 ) );
+
+		return array_values( unpack( 'J*', $encodedBytes . $appendBytes ) );
 	}
 
 	/**

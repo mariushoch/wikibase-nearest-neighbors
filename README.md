@@ -1,6 +1,7 @@
 # Wikibase Nearest Neighbors
-## This will find entities which are structurally very similar to a given entity.
-## We calculate the distance between two entities by comparing the statements which are present on both (by looking at their property ids).
+This can find entities which are structurally very similar.
+
+We calculate the distance between two entities by comparing the statements which are present on both (by looking at their property ids).
 
 ## Usage:
 * `php generateEncodingFromDump.php InputFile FileFullEncoding FileTop100Encoding`

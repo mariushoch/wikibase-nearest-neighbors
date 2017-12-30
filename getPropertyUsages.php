@@ -38,12 +38,15 @@ while ( ( $line = fgets( $f ) ) !== false ) {
 	}
 }
 
-$propertyCounts = array_flip( $propertyCounts );
-krsort( $propertyCounts );
+$i = 0;
+foreach ( $propertyCounts as $id => $count ) {
+	$results[$count * 100000 + ++$i] = [ $id, $count ];
+}
+krsort( $results );
 
 $out = "Count\tId\n";
-foreach ( $propertyCounts as $count => $id ) {
-	$out .= "$count\tP$id\n";
+foreach ( $results as $result ) {
+	$out .= "$result[1]\tP$result[0]\n";
 }
 
 if ( isset( $argv[2] ) ) {

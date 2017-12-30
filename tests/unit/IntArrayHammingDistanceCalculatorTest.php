@@ -28,18 +28,24 @@ class IntArrayHammingDistanceCalculatorTest extends PHPUnit_Framework_TestCase {
 				[ 0, 3 ],
 				[ 3, 0 ]
 			],
+			'give up' => [
+				2,
+				[ 0, 3 ],
+				[ 3, 0 ],
+				1
+			],
 		];
 	}
 
 	/**
 	 * @dataProvider provideGetDistance
 	 */
-	public function testGetDistance( $expected, array $a, array $b ) {
+	public function testGetDistance( $expected, array $a, array $b, $giveUp = PHP_INT_MAX ) {
 		$calc = new IntArrayHammingDistanceCalculator();
 
 		$this->assertSame(
 			$expected,
-			$calc->getDistance( $a, $b )
+			$calc->getDistance( $a, $b, $giveUp )
 		);
 	}
 

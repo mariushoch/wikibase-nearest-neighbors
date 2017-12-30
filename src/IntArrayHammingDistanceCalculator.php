@@ -13,17 +13,18 @@ class IntArrayHammingDistanceCalculator {
 	 *
 	 * @param int[] $a
 	 * @param int[] $b
+	 * @param int $giveUp Give up after the distance exceeds this value. In that case, the distance will be reported as $giveUp + 1
 	 *
 	 * @return int
 	 */
-	public function getDistance( array $a, array $b ) {
+	public function getDistance( array $a, array $b, $giveUp = PHP_INT_MAX ) {
 		$dist = 0;
 		$count = count( $a );
-		for ( $i = 0; $i < $count; $i++ ) {
+		for ( $i = 0; $i < $count && $dist < $giveUp; $i++ ) {
 			$val = $a[$i] ^ $b[$i];
 
 			for (; $val; $dist++ ) {
-				$val &= $val < 0 ? PHP_INT_MAX : $val - 1;
+				$val &= PHP_INT_MAX & $val - 1;
 			}
 		}
 

@@ -5,7 +5,7 @@ namespace Wikibase\NearestNeighbors;
 require_once __DIR__ . '/vendor/autoload.php';
 
 function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
-	$f = fopen( $fileName, 'r' );
+	$f = fopen( $fileName, 'rb' );
 	$header = fgets( $f );
 
 	if ( !$header ) {
@@ -26,37 +26,31 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 	$needleChunkInts = $propertyIdEncoder->encodingToIntArray( $needle );
 	$needleChunkCount = count( $needleChunkInts );
 
-	$processedEntities = 0;
 	$lineNumber = 1;
 	$cutOff = PHP_INT_MAX;
 	$results = [];
 
 	while ( ( $line = fgets( $f ) ) !== false ) {
-		$processedEntities++;
 		$lineNumber++;
 
-		$colonPos = strpos( $line, ':' );
-		$entityId = substr( $line, 0, $colonPos );
-		$line = substr( $line, $colonPos + 1 );
+		list( $entityId, $line ) = explode( ':', $line, 2 );
 
-		$entityData = $propertyIdEncoder->encodingToIntArray( $line );
 		// The byte strings might also contain new lines, thus read more lines if needed.
-		while ( $needleChunkCount > count( $entityData ) ) {
+		while ( strlen( $line ) < ceil( $propertyIdEncoder->getFieldCount() / 8 ) ) {
 			$line .= fgets( $f );
 			$lineNumber++;
-			$entityData = $propertyIdEncoder->encodingToIntArray( $line );
 		}
+		$entityData = $propertyIdEncoder->encodingToIntArray( $line );
 
 		if ( $needleChunkCount !== count( $entityData ) ) {
 			die( "Found invalid data on line $lineNumber\n" );
 		}
 
-		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts ) + $missingFromList;
+		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $cutOff + 1 ) + $missingFromList;
 		if ( $dist <= $cutOff && $dist > $minDistance ) {
 			$results[$entityId] = $dist;
+			$cutOff = cutOffResults( $results );
 		}
-
-		$cutOff = cutOffResults( $results );
 	}
 
 	return $results;

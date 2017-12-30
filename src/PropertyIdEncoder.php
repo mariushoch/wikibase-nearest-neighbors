@@ -53,7 +53,6 @@ class PropertyIdEncoder {
 
 		$encoded = [];
 		$covered = 0;
-		// TODO: This could probably be done way smarter…
 		foreach ( $this->fieldChunks as $fieldChunk ) {
 			$int = 0;
 			$i = PHP_INT_SIZE * 8;

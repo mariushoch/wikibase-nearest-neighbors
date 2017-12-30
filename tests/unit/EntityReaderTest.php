@@ -13,6 +13,7 @@ class EntityReaderTest extends PHPUnit_Framework_TestCase {
 
 	public function provideReadLineString() {
 		$str = '{' .
+			'"id":"Q2013",' .
 			'"ignore": "stuff",' .
 			'"labels":{"en":{"language":"en","value":"wobba"}},' .
 			'"descriptions":{"en":{"language":"en","value":"something something"}},' .
@@ -22,11 +23,9 @@ class EntityReaderTest extends PHPUnit_Framework_TestCase {
 
 		return [
 			'Line with trailing comma' => [
-				[ 31, 42 ],
 				$str . ",\n"
 			],
 			'Line without trailing comma' => [
-				[ 31, 42 ],
 				$str . "\n"
 			],
 		];
@@ -35,11 +34,11 @@ class EntityReaderTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider provideReadLineString
 	 */
-	public function testReadLineString( $expected, $line ) {
+	public function testReadLineString( $line ) {
 		$entityReader = new EntityReader();
 
 		$this->assertSame(
-			[ 31, 42 ],
+			[ 'Q2013', [ 31, 42 ] ],
 			$entityReader->readLineString( $line )
 		);
 	}
@@ -48,6 +47,7 @@ class EntityReaderTest extends PHPUnit_Framework_TestCase {
 		$entityReader = new EntityReader();
 
 		$str = '{' .
+			'"id":"crazy",' .
 			'"ignore": "stuff",' .
 			'"labels":{"en":{"language":"en","value":"wobba"}},' .
 			'"descriptions":{"en":{"language":"en","value":"something something"}},' .
@@ -55,7 +55,7 @@ class EntityReaderTest extends PHPUnit_Framework_TestCase {
 			"},\n";
 
 		$this->assertSame(
-			[],
+			[ 'crazy', [] ],
 			$entityReader->readLineString( $str )
 		);
 	}

@@ -12,7 +12,7 @@ class EntityReader {
 	/**
 	 * @param string $str
 	 *
-	 * @return int[] Array of the (numerical) property ids of the statements
+	 * @return array First value is the serialized entity id, second value is an array of the (numerical) property ids of the statements
 	 */
 	public function readLineString( $str ) {
 		if ( substr( $str, -2, 1 ) === ',' ) {
@@ -27,10 +27,10 @@ class EntityReader {
 		}
 
 		if ( !isset( $entity['claims'] ) ) {
-			return [];
+			return [ $entity['id'], [] ];
 		}
 
-		return $this->getNumericalPropertyIds( $entity );
+		return [ $entity['id'], $this->getNumericalPropertyIds( $entity ) ];
 	}
 
 	/**

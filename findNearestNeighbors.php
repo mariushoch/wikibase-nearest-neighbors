@@ -46,7 +46,7 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance, &$maxDistan
 	$dataLength = ceil( $propertyIdEncoder->getFieldCount() / 8 );
 
 	while ( ( $line = fgets( $f ) ) !== false ) {
-		if ( $maxDistance === $missingFromList ) {
+		if ( $maxDistance <= $missingFromList ) {
 			// No chance to find a better entity
 			fclose( $f );
 			return $results;
@@ -70,7 +70,9 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance, &$maxDistan
 		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $maxDistance ) + $missingFromList;
 		if ( $dist < $maxDistance && $dist > $minDistance ) {
 			$results[$entityId] = $dist;
-			$maxDistance = cutOffResults( $results );
+			if ( count( $results ) > 50 ) {
+				$maxDistance = cutOffResults( $results );
+			}
 		}
 	}
 
@@ -79,10 +81,6 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance, &$maxDistan
 }
 
 function cutOffResults( &$results ) {
-	if ( count( $results ) <= 50 ) {
-		return PHP_INT_MAX;
-	}
-
 	$maxValue = 0;
 	$maxId = '';
 	foreach ( $results as $id => $result ) {

@@ -29,6 +29,7 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 	$lineNumber = 1;
 	$cutOff = PHP_INT_MAX;
 	$results = [];
+	$dataLength = ceil( $propertyIdEncoder->getFieldCount() / 8 );
 
 	while ( ( $line = fgets( $f ) ) !== false ) {
 		$lineNumber++;
@@ -36,7 +37,8 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 		list( $entityId, $line ) = explode( ':', $line, 2 );
 
 		// The byte strings might also contain new lines, thus read more lines if needed.
-		while ( strlen( $line ) < ceil( $propertyIdEncoder->getFieldCount() / 8 ) ) {
+		// Make sure to always read $dataLength and the closing \n (thus $dataLength + 1) bytes.
+		while ( strlen( $line ) < $dataLength + 1 ) {
 			$line .= fgets( $f );
 			$lineNumber++;
 		}

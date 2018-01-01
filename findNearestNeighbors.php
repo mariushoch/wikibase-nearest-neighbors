@@ -43,7 +43,7 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 		$entityData = $propertyIdEncoder->encodingToIntArray( $line );
 
 		if ( $needleChunkCount !== count( $entityData ) ) {
-			die( "Found invalid data on line $lineNumber\n" );
+			die( "\"$fileName\": Found invalid data on line $lineNumber\n" );
 		}
 
 		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $cutOff + 1 ) + $missingFromList;

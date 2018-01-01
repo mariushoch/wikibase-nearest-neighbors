@@ -4,7 +4,22 @@ namespace Wikibase\NearestNeighbors;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
+function getEncodeLength( $fileName ) {
+	$f = fopen( $fileName, 'rb' );
+	$header = fgets( $f );
+
+	if ( !$header ) {
+		echo "File \"$fileName\" must not be empty.\n";
+		exit( 1 );
+	}
+
+	$entityOrder = array_map( 'intval', explode( ',', $header ) );
+
+	fclose( $f );
+	return count( $entityOrder );
+}
+
+function getResFromFile( $fileName, $needleEntityData, $minDistance, &$maxDistance ) {
 	$f = fopen( $fileName, 'rb' );
 	$header = fgets( $f );
 
@@ -27,11 +42,15 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 	$needleChunkCount = count( $needleChunkInts );
 
 	$lineNumber = 1;
-	$cutOff = PHP_INT_MAX;
 	$results = [];
 	$dataLength = ceil( $propertyIdEncoder->getFieldCount() / 8 );
 
 	while ( ( $line = fgets( $f ) ) !== false ) {
+		if ( $maxDistance === $missingFromList ) {
+			// No chance to find a better entity
+			fclose( $f );
+			return $results;
+		}
 		$lineNumber++;
 
 		list( $entityId, $line ) = explode( ':', $line, 2 );
@@ -48,13 +67,14 @@ function getResFromFile( $fileName, $needleEntityData, $minDistance ) {
 			die( "\"$fileName\": Found invalid data on line $lineNumber\n" );
 		}
 
-		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $cutOff + 1 ) + $missingFromList;
-		if ( $dist <= $cutOff && $dist > $minDistance ) {
+		$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $maxDistance ) + $missingFromList;
+		if ( $dist < $maxDistance && $dist > $minDistance ) {
 			$results[$entityId] = $dist;
-			$cutOff = cutOffResults( $results );
+			$maxDistance = cutOffResults( $results );
 		}
 	}
 
+	fclose( $f );
 	return $results;
 }
 
@@ -91,9 +111,15 @@ $needleEntityData = $entityReader->readEntityDataString( $needleEntity );
 
 $encodedFiles = [];
 $remainingArgs = array_slice( $argv, 2 );
+$i = 0;
 while ( $remainingArgs && $remainingArgs[0] !== '--min-distance' ) {
-	$encodedFiles[] = array_shift( $remainingArgs );
+	$fileName = array_shift( $remainingArgs );
+	$encodedFiles[getEncodeLength( $fileName ) * 100000 + ++$i ] = $fileName;
 }
+
+// Make sure we start with the longest encodings… try to reduce $maxDistance so far
+// that we don't need to search all files.
+krsort( $encodedFiles );
 
 if ( isset( $remainingArgs[1] ) ) {
 	$minDistance = intval( $remainingArgs[1] );
@@ -102,11 +128,12 @@ if ( isset( $remainingArgs[1] ) ) {
 }
 
 $results = [];
+$maxDistance = PHP_INT_MAX;
 
 foreach ( $encodedFiles as $encodedFile ) {
 	$results = array_merge(
 		$results,
-		getResFromFile( $encodedFile, $needleEntityData, $minDistance )
+		getResFromFile( $encodedFile, $needleEntityData, $minDistance, $maxDistance )
 	);
 }
 

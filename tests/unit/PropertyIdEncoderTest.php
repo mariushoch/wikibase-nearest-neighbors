@@ -88,7 +88,7 @@ class PropertyIdEncoderTest extends PHPUnit_Framework_TestCase {
 		$encoded = $encoder->getEncoded( [ 4 ] )[1];
 
 		$this->assertSame(
-			[ 0 | 1 << ( PHP_INT_SIZE * 8 - 4 ) ],
+			[ 1 => 0 | 1 << ( PHP_INT_SIZE * 8 - 4 ) ],
 			$encoder->encodingToIntArray( $encoded )
 		);
 	}

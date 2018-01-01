@@ -30,6 +30,11 @@ class PropertyIdEncoder {
 	private $name;
 
 	/**
+	 * @var string|null
+	 */
+	private $appendByteCache = null;
+
+	/**
 	 * @param int $fields
 	 * @param string $name
 	 */
@@ -88,10 +93,12 @@ class PropertyIdEncoder {
 	 * @return int[]
 	 */
 	public function encodingToIntArray( $encodedBytes ) {
-		$missingBytes = ( PHP_INT_SIZE * 8 - ( $this->fieldCount % ( PHP_INT_SIZE * 8 ) ) ) % ( PHP_INT_SIZE * 8 );
-		$appendBytes = str_repeat( "\0", floor( $missingBytes / 8 ) );
+		if ( $this->appendByteCache === null ) {
+			$missingBytes = ( PHP_INT_SIZE * 8 - ( $this->fieldCount % ( PHP_INT_SIZE * 8 ) ) ) % ( PHP_INT_SIZE * 8 );
+			$this->appendByteCache = str_repeat( "\0", floor( $missingBytes / 8 ) );
+		}
 
-		return array_values( unpack( 'J*', $encodedBytes . $appendBytes ) );
+		return unpack( 'J*', $encodedBytes . $this->appendByteCache );
 	}
 
 	/**

@@ -20,18 +20,18 @@ class IntArrayHammingDistanceCalculatorTest extends PHPUnit_Framework_TestCase {
 			],
 			'short input' => [
 				2,
-				[ 0 ],
-				[ 3 ]
+				[ 1 => 0 ],
+				[ 1 => 3 ]
 			],
 			'short input' => [
 				4,
-				[ 0, 3 ],
-				[ 3, 0 ]
+				[ 1 => 0, 2 => 3 ],
+				[ 1 => 3, 0 ]
 			],
 			'give up' => [
 				2,
-				[ 0, 3 ],
-				[ 3, 0 ],
+				[ 1 => 0, 2 => 3 ],
+				[ 1 => 3, 2 => 0 ],
 				1
 			],
 		];

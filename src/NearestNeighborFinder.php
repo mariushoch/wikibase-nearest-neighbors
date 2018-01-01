@@ -154,7 +154,7 @@ class NearestNeighborFinder {
 				die( "\"$fileName\": Found invalid data on line $lineNumber\n" );
 			}
 
-			$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $maxDistance ) + $missingFromList;
+			$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $maxDistance - $missingFromList ) + $missingFromList;
 			if ( $dist < $maxDistance && $dist > $minDistance ) {
 				$results[$entityId] = $dist;
 				if ( count( $results ) > 50 ) {

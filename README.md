@@ -10,6 +10,6 @@ We calculate the distance between two entities by comparing the statements which
 * `php findNearestNeighbors.php EntityId FileFullEncoding FileTop100Encoding`
   * Example: `php findNearestNeighbors.php Q64 /tmp/nn-*`
 
-A PropertyUsageFile can be obtained via `getPropertyUsages.php InputFile [OutputFile]`.
+A PropertyUsageFile can be obtained by using `bin/getPropertyUsages` (which again takes a decrompressed dump as input).
 
 * Note: `InputFile` is assumed to be an already decrompressed dump. You can for example pipe a dump in like `bzip2 -cdk dump.json.bz2 | php getPropertyUsages.php php://stdin propertyUsages.txt`

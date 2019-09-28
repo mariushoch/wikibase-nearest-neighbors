@@ -1,0 +1,68 @@
+#!/bin/env php
+<?php
+
+namespace Wikibase\NearestNeighbors;
+use Wikimedia\AtEase\AtEase;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+if ( $argc < 2 || $argv[1] === '--help' || $argv[1] === '-h' ) {
+	echo "getPropertyUsages: Read a JSON dump and output a list of all property ids and on how many entities these are used in statements." . PHP_EOL . PHP_EOL;
+	echo "Usage: DumpFile [OutputFile]" . PHP_EOL;
+
+	exit( 1 );
+}
+
+$entityReader = new EntityReader();
+
+$dumpFileName = $argv[1];
+$outputFileName = $argv[2] ?? null;
+
+AtEase::suppressWarnings();
+$f = fopen( $argv[1], 'r' );
+AtEase::restoreWarnings();
+
+if ( !$f ) {
+	echo "$dumpFileName is not readable." . PHP_EOL . PHP_EOL;
+	exit( 1 );
+}
+$i = 0;
+while ( ( $line = fgets( $f ) ) !== false ) {
+	$i++;
+
+	if ( strlen( $line ) < 5 ) {
+		// Start/ end line
+		continue;
+	}
+
+	$propertyIds = $entityReader->readLineString( $line )[1];
+
+	foreach ( $propertyIds as $id ) {
+		if ( isset( $propertyCounts[$id] ) ) {
+			$propertyCounts[$id]++;
+		} else {
+			$propertyCounts[$id] = 1;
+		}
+	}
+	
+	if ( $i % 10000 === 0 ) {
+		file_put_contents( 'php://stderr', "Processed $i entities.\n", FILE_APPEND );
+	}
+}
+
+$i = 0;
+foreach ( $propertyCounts as $id => $count ) {
+	$results[$count * 100000 + ++$i] = [ $id, $count ];
+}
+krsort( $results );
+
+$out = "Count\tId\n";
+foreach ( $results as $result ) {
+	$out .= "$result[1]\tP$result[0]\n";
+}
+
+if ( $outputFileName ) {
+	file_put_contents( $outputFileName, $out );
+} else {
+	echo $out;
+}

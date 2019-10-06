@@ -1,15 +1,15 @@
 <?php
 
-namespace Wikibase\NearestNeighbors\FieldProviders;
+namespace Wikibase\NearestNeighbors\FieldsProvider;
 
 /**
  * Provides a list of numeric property ids suitable for encoding property
  * usages against.
  */
-interface FieldProvider {
+interface FieldsProvider {
 
 	/**
-	 * @return int[] Consecutive 0-based list of numeric property ids.
+	 * @return int[] Ordered list of numeric property ids.
 	 */
 	public function getFields();
 

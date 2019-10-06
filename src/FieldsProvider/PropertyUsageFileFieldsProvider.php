@@ -1,12 +1,12 @@
 <?php
 
-namespace Wikibase\NearestNeighbors\FieldProviders;
+namespace Wikibase\NearestNeighbors\FieldsProvider;
 use RuntimeException;
 
 /**
  * Get a field mapping from a given PropertyUsageFile (as obtained from getPropertyUsages).
  */
-class PropertyUsageFileFieldProvider implements FieldProvider {
+class PropertyUsageFileFieldsProvider implements FieldsProvider {
 
 	/**
 	 * @var string
@@ -54,7 +54,7 @@ class PropertyUsageFileFieldProvider implements FieldProvider {
 			$id = explode( "\t", $line, 2 )[1];
 			$id = trim( $id );
 			if ( !preg_match( '/^P[1-9]\d{0,9}\z/i', $id ) ) {
-				throw new RuntimeException( "PropertyUsageFileFieldProvider: Invalid line $lineNumber." );
+				throw new RuntimeException( "PropertyUsageFileFieldsProvider: Invalid line $lineNumber." );
 			}
 
 			$propertyIds[] = $id;

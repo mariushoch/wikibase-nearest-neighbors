@@ -1,14 +1,15 @@
+#!/bin/env php
 <?php
 
 namespace Wikibase\NearestNeighbors;
 use Wikibase\NearestNeighbors\NearestNeighborFinder;
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // FIXME: Use getopt or something similar…
 // TODO: Make sure this is not Wikidata specific
 if ( $argc < 3 || $argv[1] === '--help' || $argv[1] === '-h' ) {
-	echo "generateEncodingFromDump.php: Read a Wikidata JSON dump and output minimal encoding of the statements present.\n\n";
+	echo "findNearestNeighbors: Find the nearest neighbor for the given entity.\n\n";
 	echo "Usage: EntityId EncodingInputFile [EncodingInputFile]* [--min-distance minDistance]\n";
 
 	exit( 1 );

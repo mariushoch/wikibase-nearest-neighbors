@@ -1,17 +1,17 @@
 <?php
 
-namespace Wikibase\NearestNeighbors\Tests\FieldProviders;
+namespace Wikibase\NearestNeighbors\Tests\FieldsProvider;
 
 use PHPUnit_Framework_TestCase;
-use Wikibase\NearestNeighbors\FieldProviders\PropLinksFieldProvider;
+use Wikibase\NearestNeighbors\FieldsProvider\PropLinksFieldsProvider;
 
 /**
- * @covers Wikibase\NearestNeighbors\FieldProviders\PropLinksFieldProvider
+ * @covers Wikibase\NearestNeighbors\FieldsProvider\PropLinksFieldsProvider
  */
-class PropLinksFieldProviderTest extends PHPUnit_Framework_TestCase {
+class PropLinksFieldsProviderTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetFields() {
-		$provider = new PropLinksFieldProvider(
+		$provider = new PropLinksFieldsProvider(
 			'https://www.wikidata.org/w/api.php',
 			'Wikidata:Database reports/List of properties/Top100',
 			120

@@ -1,11 +1,11 @@
 <?php
 
-namespace Wikibase\NearestNeighbors\FieldProviders;
+namespace Wikibase\NearestNeighbors\FieldsProvider;
 
 /**
  * Get a field mapping containing *all properties* that exist on a MediaWiki instance.
  */
-class WikibaseAllPropertiesFieldProvider implements FieldProvider {
+class WikibaseAllPropertiesFieldsProvider implements FieldsProvider {
 
 	/**
 	 * @var string

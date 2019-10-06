@@ -3,8 +3,8 @@
 
 namespace Wikibase\NearestNeighbors;
 
-use Wikibase\NearestNeighbors\FieldProviders\PropertyUsageFileFieldProvider;
-use Wikibase\NearestNeighbors\FieldProviders\WikibaseAllPropertiesFieldProvider;
+use Wikibase\NearestNeighbors\FieldsProvider\PropertyUsageFileFieldsProvider;
+use Wikibase\NearestNeighbors\FieldsProvider\WikibaseAllPropertiesFieldsProvider;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -30,7 +30,7 @@ $outputFileFullEncoding = $argv[2];
 
 $entityReader = new EntityReader();
 
-$fullFields = ( new WikibaseAllPropertiesFieldProvider(
+$fullFields = ( new WikibaseAllPropertiesFieldsProvider(
 		'https://www.wikidata.org/w/api.php',
 		120
 	) )->getFields();
@@ -45,7 +45,7 @@ $encodersToFile = [ 'full' => $outputFileFullEncoding ];
 $remainingArgs = array_slice( $argv, 3 );
 if ( $remainingArgs ) {
 	$propertyUsageFile = array_shift( $remainingArgs );
-	$propertyUsageProvider = new PropertyUsageFileFieldProvider( $propertyUsageFile );
+	$propertyUsageProvider = new PropertyUsageFileFieldsProvider( $propertyUsageFile );
 }
 
 while ( $remainingArgs ) {

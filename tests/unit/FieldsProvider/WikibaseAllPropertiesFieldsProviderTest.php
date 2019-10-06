@@ -1,17 +1,17 @@
 <?php
 
-namespace Wikibase\NearestNeighbors\Tests\FieldProviders;
+namespace Wikibase\NearestNeighbors\Tests\FieldsProvider;
 
 use PHPUnit_Framework_TestCase;
-use Wikibase\NearestNeighbors\FieldProviders\WikibaseAllPropertiesFieldProvider;
+use Wikibase\NearestNeighbors\FieldsProvider\WikibaseAllPropertiesFieldsProvider;
 
 /**
- * @covers Wikibase\NearestNeighbors\FieldProviders\WikibaseAllPropertiesFieldProvider
+ * @covers Wikibase\NearestNeighbors\FieldsProvider\WikibaseAllPropertiesFieldsProvider
  */
-class WikibaseAllPropertiesFieldProviderTest extends PHPUnit_Framework_TestCase {
+class WikibaseAllPropertiesFieldsProviderTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetFields() {
-		$provider = new WikibaseAllPropertiesFieldProvider(
+		$provider = new WikibaseAllPropertiesFieldsProvider(
 			'https://www.wikidata.org/w/api.php',
 			120
 		);

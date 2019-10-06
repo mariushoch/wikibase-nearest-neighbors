@@ -1,12 +1,12 @@
 <?php
 
-namespace Wikibase\NearestNeighbors\FieldProviders;
+namespace Wikibase\NearestNeighbors\FieldsProvider;
 
 /**
- * Get a property field mapping containing all properties linked from a given page.
+ * Get a property field list containing all properties linked from a given page.
  * This uses the MediaWiki API.
  */
-class PropLinksFieldProvider implements FieldProvider {
+class PropLinksFieldsProvider implements FieldsProvider {
 
 	/**
 	 * @var string

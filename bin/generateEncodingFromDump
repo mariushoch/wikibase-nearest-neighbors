@@ -1,3 +1,4 @@
+#!/bin/env php
 <?php
 
 namespace Wikibase\NearestNeighbors;
@@ -5,7 +6,7 @@ namespace Wikibase\NearestNeighbors;
 use Wikibase\NearestNeighbors\FieldProviders\PropertyUsageFileFieldProvider;
 use Wikibase\NearestNeighbors\FieldProviders\WikibaseAllPropertiesFieldProvider;
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 function flushBuffers( array &$buffers ) {
 	global $encodersToFile;
@@ -19,11 +20,13 @@ function flushBuffers( array &$buffers ) {
 
 // FIXME: Use getopt or something similar…
 if ( $argc < 3 || $argv[1] === '--help' || $argv[1] === '-h' ) {
-	echo "generateEncodingFromDump.php: Read a JSON dump and output minimal encoding of the statements present.\n\n";
+	echo "generateEncodingFromDump: Read a JSON dump and output minimal encoding of the statements present.\n\n";
 	echo "Usage: InputFile OutputFileFullEncoding [PropertyUsageFile] [N:OutputFileTopN]*\n";
 
 	exit( 1 );
 }
+$inputFile = $argv[1];
+$outputFileFullEncoding = $argv[2];
 
 $entityReader = new EntityReader();
 
@@ -32,12 +35,12 @@ $fullFields = ( new WikibaseAllPropertiesFieldProvider(
 		120
 	) )->getFields();
 
-file_put_contents( $argv[2], implode( ',', $fullFields ) . "\n" );
+file_put_contents( $outputFileFullEncoding, implode( ',', $fullFields ) . "\n" );
 
 $encoders = [
 	new PropertyIdEncoder( $fullFields, 'full' )
 ];
-$encodersToFile = [ 'full' => $argv[2] ];
+$encodersToFile = [ 'full' => $outputFileFullEncoding ];
 
 $remainingArgs = array_slice( $argv, 3 );
 if ( $remainingArgs ) {
@@ -64,7 +67,7 @@ while ( $remainingArgs ) {
 
 $partitioningPropertyIdEncoder = new PartitioningPropertyIdEncoder( $encoders );
 
-$f = fopen( $argv[1], 'r' );
+$f = fopen( $inputFile, 'r' );
 $buffers = [];
 $i = 0;
 while ( ( $line = fgets( $f ) ) !== false ) {

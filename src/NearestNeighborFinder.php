@@ -1,6 +1,7 @@
 <?php
 
 namespace Wikibase\NearestNeighbors;
+use Wikibase\NearestNeighbors\EncodedFileDistance\EncodedFileDistanceCalculator;
 use RuntimeException;
 
 /**
@@ -56,6 +57,10 @@ class NearestNeighborFinder {
 				$results,
 				$this->getResFromFile( $encodedFile, $needleEntityData, $minDistance, $maxDistance )
 			);
+
+			$maxDistanceResults = $results;
+			sort( $maxDistanceResults );
+			$maxDistance = max( array_splice( $maxDistanceResults, 0, 50 ) );
 		}
 
 		$displayResults = [];
@@ -104,7 +109,7 @@ class NearestNeighborFinder {
 		return count( $entityOrder );
 	}
 
-	private function getResFromFile( $fileName, $needleEntityData, $minDistance, &$maxDistance ) {
+	private function getResFromFile( $fileName, $needleEntityData, $minDistance, $maxDistance ) {
 		$f = fopen( $fileName, 'rb' );
 		if ( !$f ) {
 			throw new RuntimeException( "File \"$fileName\" can't be read." );
@@ -114,8 +119,7 @@ class NearestNeighborFinder {
 		if ( !$header ) {
 			throw new RuntimeException( "File \"$fileName\" must not be empty." );
 		}
-
-		$hammingDistanceCalculator = new IntArrayHammingDistanceCalculator();
+		fclose( $f );
 
 		$entityOrder = array_map( 'intval', explode( ',', $header ) );
 		// Some property ids might not be present in the current encoding file at all,
@@ -126,52 +130,18 @@ class NearestNeighborFinder {
 		$needle = $propertyIdEncoder->getEncoded( $needleEntityData[1] )[1];
 
 		$needleChunkInts = $propertyIdEncoder->encodingToIntArray( $needle );
-		$needleChunkCount = count( $needleChunkInts );
-
-		$entityNumber = 0;
-		$results = [];
 		$dataLength = ceil( $propertyIdEncoder->getFieldCount() / 8 );
 
-		while ( ( $paddedEntityId = fread( $f, 10 ) ) !== '' ) {
-			if ( $maxDistance <= $missingFromList ) {
-				// No chance to find a better entity
-				fclose( $f );
-				return $results;
-			}
-			$entityNumber++;
-
-			$line = fread( $f, $dataLength );
-			$entityData = $propertyIdEncoder->encodingToIntArray( $line );
-
-			if ( $needleChunkCount !== count( $entityData ) ) {
-				die( "\"$fileName\": Found invalid data for entity No. $entityNumber\n" );
-			}
-
-			$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $maxDistance - $missingFromList ) + $missingFromList;
-			if ( $dist < $maxDistance && $dist > $minDistance ) {
-				$entityId = trim( $paddedEntityId );
-				$results[$entityId] = $dist;
-				if ( count( $results ) > 50 ) {
-					$maxDistance = $this->cutOffResults( $results );
-				}
-			}
-		}
-
-		fclose( $f );
-		return $results;
+		$encodedFileDistanceCalculator = new EncodedFileDistanceCalculator();
+		return $encodedFileDistanceCalculator->getCloseEntries(
+			$fileName,
+			$needleChunkInts,
+			$propertyIdEncoder,
+			$dataLength,
+			$minDistance,
+			$maxDistance,
+			$missingFromList
+		);
 	}
 
-	private function cutOffResults( &$results ) {
-		$maxValue = 0;
-		$maxId = '';
-		foreach ( $results as $id => $result ) {
-			if ( $result > $maxValue ) {
-				$maxValue = $result;
-				$maxId = $id;
-			}
-		}
-
-		unset( $results[$maxId] );
-		return $maxValue;
-	}
 }

@@ -128,34 +128,28 @@ class NearestNeighborFinder {
 		$needleChunkInts = $propertyIdEncoder->encodingToIntArray( $needle );
 		$needleChunkCount = count( $needleChunkInts );
 
-		$lineNumber = 1;
+		$entityNumber = 0;
 		$results = [];
 		$dataLength = ceil( $propertyIdEncoder->getFieldCount() / 8 );
 
-		while ( ( $line = fgets( $f ) ) !== false ) {
+		while ( ( $paddedEntityId = fread( $f, 10 ) ) !== '' ) {
 			if ( $maxDistance <= $missingFromList ) {
 				// No chance to find a better entity
 				fclose( $f );
 				return $results;
 			}
-			$lineNumber++;
+			$entityNumber++;
 
-			list( $entityId, $line ) = explode( ':', $line, 2 );
-
-			// The byte strings might also contain new lines, thus read more lines if needed.
-			// Make sure to always read $dataLength and the closing \n (thus $dataLength + 1) bytes.
-			while ( strlen( $line ) < $dataLength + 1 ) {
-				$line .= fgets( $f );
-				$lineNumber++;
-			}
+			$line = fread( $f, $dataLength );
 			$entityData = $propertyIdEncoder->encodingToIntArray( $line );
 
 			if ( $needleChunkCount !== count( $entityData ) ) {
-				die( "\"$fileName\": Found invalid data on line $lineNumber\n" );
+				die( "\"$fileName\": Found invalid data for entity No. $entityNumber\n" );
 			}
 
 			$dist = $hammingDistanceCalculator->getDistance( $entityData, $needleChunkInts, $maxDistance - $missingFromList ) + $missingFromList;
 			if ( $dist < $maxDistance && $dist > $minDistance ) {
+				$entityId = trim( $paddedEntityId );
 				$results[$entityId] = $dist;
 				if ( count( $results ) > 50 ) {
 					$maxDistance = $this->cutOffResults( $results );

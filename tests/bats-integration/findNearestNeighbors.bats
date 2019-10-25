@@ -14,6 +14,7 @@ function teardown {
 @test "findNearestNeighbors: Q31" {
 	bzcat "$top4File" | php "$BATS_TEST_DIRNAME/../../bin/generateEncodingFromDump" php://stdin "$encodingFile"
 
+	php "$BATS_TEST_DIRNAME/../../bin/findNearestNeighbors" Q31 "$encodingFile"
 	run php "$BATS_TEST_DIRNAME/../../bin/findNearestNeighbors" Q31 "$encodingFile"
 	echo "$output" | head -n1 | grep -Pq '^Id\W+Distance$'
 	# Q31 should be the first result

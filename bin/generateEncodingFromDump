@@ -85,7 +85,9 @@ while ( ( $line = fgets( $f ) ) !== false ) {
 		$buffers[$encoded[0]] = '';
 	}
 
-	$buffers[$encoded[0]] .= $entity[0] . ':' . $encoded[1] . "\n";
+	// Assumes we will not have an item id above Q999,999,999
+	$paddedEntityId = str_pad($entity[0], 10, " ");
+	$buffers[$encoded[0]] .= "$paddedEntityId$encoded[1]";
 
 	// Only write to target file for every 10000 rows
 	if ( $i % 10000 === 0 ) {

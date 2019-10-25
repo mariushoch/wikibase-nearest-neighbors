@@ -16,10 +16,10 @@ function teardown {
 	outFile="$(mktemp)"
 
 	bzcat "$top4File" | php "$BATS_TEST_DIRNAME/../../bin/generateEncodingFromDump" php://stdin "$outFile"
-	grep -qP '^Q8:' "$outFile"
-	grep -qP '^Q23:' "$outFile"
-	grep -qP '^Q24:' "$outFile"
-	grep -qP '^Q31:' "$outFile"
+	grep -qP 'Q8\W+' "$outFile"
+	grep -qP 'Q23\W+' "$outFile"
+	grep -qP 'Q24\W+' "$outFile"
+	grep -qP 'Q31\W+' "$outFile"
 
 	rm -f "$outFile"
 }
@@ -44,12 +44,12 @@ function teardown {
 
 	bzcat "$top4File" | php "$BATS_TEST_DIRNAME/../../bin/generateEncodingFromDump" php://stdin "$outFile1" "$propertyUsages" "250:$outFile2"
 	# Both the full and the top-n-file should be used
-	[ "$(wc -l "$outFile1" | awk '{print $1}')" -gt 1 ]
-	[ "$(wc -l "$outFile2" | awk '{print $1}')" -gt 1 ]
-	grep -qP '^Q8:' "$outFile1" "$outFile2"
-	grep -qP '^Q23:' "$outFile1" "$outFile2"
-	grep -qP '^Q24:' "$outFile1" "$outFile2"
-	grep -qP '^Q31:' "$outFile1" "$outFile2"
+	[ "$(wc -c "$outFile1" | awk '{print $1}')" -gt 15000 ]
+	[ "$(wc -c "$outFile2" | awk '{print $1}')" -gt 450 ]
+	grep -qP '^Q8\W+' "$outFile1" "$outFile2"
+	grep -qP '^Q23\W+' "$outFile1" "$outFile2"
+	grep -qP '^Q24\W+' "$outFile1" "$outFile2"
+	grep -qP '^Q31\W+' "$outFile1" "$outFile2"
 
 	rm -f "$outFile1" "$outFile2"
 }

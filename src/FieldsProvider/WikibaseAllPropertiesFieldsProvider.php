@@ -1,6 +1,7 @@
 <?php
 
 namespace Wikibase\NearestNeighbors\FieldsProvider;
+use RuntimeException;
 
 /**
  * Get a field mapping containing *all properties* that exist on a MediaWiki instance.
